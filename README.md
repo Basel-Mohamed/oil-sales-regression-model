@@ -123,11 +123,6 @@ for example:
 
 ```
 
-3. Retrain Model
-
-URL: ```POST /train```
-Description: Triggers the training pipeline on the server to update the model.
-
 # 📊 Features & Improvements
 
 ## ✅ Robust Preprocessing

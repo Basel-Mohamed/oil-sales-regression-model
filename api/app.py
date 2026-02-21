@@ -6,6 +6,8 @@ import io
 import sys
 sys.path.append('..')
 from src.inference import PredictionPipeline
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = FastAPI(title="Oil Sales Prediction API")
 
@@ -20,9 +22,9 @@ app.add_middleware(
 
 # Initialize pipeline
 pipeline = PredictionPipeline(
-    model_path='D:\\oil-sales-regression-model\\models\\random_forest_model.pkl',
-    scaler_path='D:\\oil-sales-regression-model\\models\\scaler.pkl',
-    encoders_path='D:\\oil-sales-regression-model\\models\\encoders.pkl'
+    model_path=os.path.join(BASE_DIR, 'models', 'random_forest_model.pkl'),
+    scaler_path=os.path.join(BASE_DIR, 'models', 'scaler.pkl'),
+    encoders_path=os.path.join(BASE_DIR, 'models', 'encoders.pkl')
 )
 
 class PredictionRequest(BaseModel):

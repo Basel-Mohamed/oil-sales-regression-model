@@ -20,9 +20,9 @@ app.add_middleware(
 
 # Initialize pipeline
 pipeline = PredictionPipeline(
-    model_path='../models/random_forest_model.pkl',
-    scaler_path='../models/scaler.pkl',
-    encoders_path='../models/encoders.pkl'
+    model_path='D:\\oil-sales-regression-model\\models\\random_forest_model.pkl',
+    scaler_path='D:\\oil-sales-regression-model\\models\\scaler.pkl',
+    encoders_path='D:\\oil-sales-regression-model\\models\\encoders.pkl'
 )
 
 class PredictionRequest(BaseModel):

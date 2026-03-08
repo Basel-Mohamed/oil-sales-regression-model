@@ -1,17 +1,25 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+"""
+app.py
+Main entry point for the Oil Sales Prediction API.
+"""
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
-import pandas as pd
-import io
-import sys
-sys.path.append('..')
-from src.inference import PredictionPipeline
 import os
+import sys
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
 
-app = FastAPI(title="Oil Sales Prediction API")
+# Import the modular routers
+from api.ml_routes import router as ml_router
+from api.chat_routes import router as chat_router
 
-# CORS configuration
+app = FastAPI(
+    title="Oil Sales Prediction & Chatbot API",
+    description="ML API and Conversational Agent for predicting oil volume sales",
+    version="1.0.0"
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,44 +28,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize pipeline
-pipeline = PredictionPipeline(
-    model_path=os.path.join(BASE_DIR, 'models', 'random_forest_model.pkl'),
-    scaler_path=os.path.join(BASE_DIR, 'models', 'scaler.pkl'),
-    encoders_path=os.path.join(BASE_DIR, 'models', 'encoders.pkl')
-)
+# Register the routers
+app.include_router(ml_router)
+app.include_router(chat_router)
 
-class PredictionRequest(BaseModel):
-    city: str
-    store_name: str
-    manufacturer: str
-    brand: str
-    class_: str = Field(alias="class")
-    size: str
-    price_bracket: str
-    year: int
-    month: int
-    value_sales: float
-    average_price: float
-    
-    class Config:
-        fields = {'class_': 'class'}
-
-@app.get("/")
-def read_root():
-    return {"message": "Oil Sales Prediction API", "status": "active"}
-
-@app.post("/predict")
-def predict_single(request: PredictionRequest):
-    """Predict volume sales for a single record"""
-    try:
-        record = request.dict()
-        record['class'] = record.pop('class_')
-        result = pipeline.predict_single(record)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "model": "loaded"}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

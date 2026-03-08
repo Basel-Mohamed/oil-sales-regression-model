@@ -7,3 +7,5 @@ seaborn==0.13.2
 pandas==2.3.3
 numpy==2.3.5
 scikit-learn==1.7.2
+cohere==5.20.7
+python-dotenv==1.0.0

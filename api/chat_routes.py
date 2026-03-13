@@ -80,10 +80,13 @@ async def chat(request: ChatRequest):
 
         session["history"].append({"role": "USER", "message": user_message})
         session["history"].append({"role": "CHATBOT", "message": agent_reply})
+        
+        # Update session with new extracted data
         session["extracted_data"].update(new_extracted)
 
         updated_missing = [f for f in REQUIRED_FIELDS if f not in session["extracted_data"]]
 
+        # If all fields are collected, run the prediction
         if not updated_missing:
             clean_data = session["extracted_data"].copy()
             
@@ -109,12 +112,12 @@ async def chat(request: ChatRequest):
                 
                 # Format the response for the user
                 final_text = f"📊 Sales Prediction Results for {clean_data.get('brand', 'Product')}\n\n"
-                final_text += f"🏭 Manufacturer: {clean_data.get('manufacturer', 'Unknown')}\n"
+                final_text += f"🏢 Manufacturer: {clean_data.get('manufacturer', 'Unknown')}\n"
                 final_text += f"📍 City/Store: {clean_data.get('city', 'Unknown')} - {clean_data.get('store_name', 'Unknown')}\n"
                 final_text += f"📅 Period: {clean_data.get('month', '')}/{clean_data.get('year', '')}\n\n"
                 
                 # Using comma formatting for large volume numbers
-                final_text += f"🔮 **Predicted Volume Sales: {predicted_volume:,.2f} units**\n\n"
+                final_text += f"✨ **Predicted Volume Sales: {predicted_volume:,.2f} units**\n\n"
                 
                 final_text += "Would you like to forecast another product?"
 
@@ -122,7 +125,8 @@ async def chat(request: ChatRequest):
                     "status": "success",
                     "response": final_text,
                     "session_id": session_id,
-                    "prediction_data": prediction_result
+                    "prediction_data": prediction_result,
+                    "extracted_data": session["extracted_data"] # Added here to ensure UI stays synced at the end
                 }
                 
             except Exception as ve:
@@ -132,10 +136,12 @@ async def chat(request: ChatRequest):
                     "session_id": session_id
                 }
 
+        # For ongoing conversations, return the extracted data progressively!
         return {
             "status": "success",
             "response": agent_reply,
-            "session_id": session_id
+            "session_id": session_id,
+            "extracted_data": session["extracted_data"] # <--- THE CRITICAL FIX IS HERE
         }
 
     except Exception as e:

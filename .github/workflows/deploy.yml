@@ -12,6 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          echo "COHERE_API_KEY=${{ 4sGKYNsAgfhzTXsYicFABbLu1O92hFTDSfVcFscb }}" > .env
+  
       - name: Sync and Restart Service
         run: |
           # route to the project directory

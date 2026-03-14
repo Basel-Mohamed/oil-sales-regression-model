@@ -1,0 +1,24 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sync and Restart Service
+        run: |
+          # route to the project directory
+          cd ~/oil-sales-regression-model
+          # pull from main branch
+          git pull origin main
+          # install dependencies
+          ./venv/bin/pip install -r requirements.txt
+          # restart the oil service
+          sudo systemctl restart oil
